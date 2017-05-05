@@ -1,0 +1,6 @@
+[package]
+name = "rola"
+version = "0.1.0"
+authors = ["mikopits <mikopits@gmail.com>"]
+
+[dependencies]
