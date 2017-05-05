@@ -1,5 +1,7 @@
 # rola
 
+[![Join the chat at https://gitter.im/rola-dev/Lobby](https://badges.gitter.im/rola-dev/Lobby.svg)](https://gitter.im/rola-dev/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Rola (Rust Optimized Linear Algebra) is (will be) a Rust linear algebra
 library aiming to be fast and robust with the intent of use in numerical
 computing.
