@@ -1,5 +1,4 @@
-rola
-====
+# rola
 
 Rola (Rust Optimized Linear Algebra) is (will be) a Rust linear algebra
 library aiming to be fast and robust with the intent of use in numerical
@@ -8,8 +7,7 @@ computing.
 The scope of the project is to create fast, robust matrix and vector
 operations, and to solve ``Ax = b`` as quickly and efficiently as possible.
 
-Goals
------
+# Goals
 
 1. Idiomatic, clean Rust
 2. Mathematically sound
@@ -24,12 +22,12 @@ Potentially look into GPU acceleration:
 Research
 --------
 
-### References
+#### References
 * [LAPACK](https://github.com/reference-lapack/lapack) FORTRAN, tried and true
 * [Blaze](https://bitbucket.org/blaze-lib/blaze) C++, cutting edge and [fast](https://bitbucket.org/blaze-lib/blaze/wiki/Benchmarks)
 * [Eigen](https://bitbucket.org/eigen/eigen) Pure C++, clean and robust
 
-### Study Material & Theory
+#### Study Material & Theory
 * Numerical Analysis/Methods
   * [Numerical Computation of Matrix Functions (Smith)](http://www.maths.manchester.ac.uk/~higham/links/theses/smith02.pdf)
   * [Fundamental Numerical Methods and Data Analysis (Collins)](http://ads.harvard.edu/books/1990fnmd.book)
@@ -43,3 +41,7 @@ Research
   * [Lectures in Basic Computation Numerical Analysis (McDonough)](http://www.engr.uky.edu/~acfd/egr537-lctrs.pdf)
 * arXiv.org
   * [Numerical Analysis Category](https://arxiv.org/list/math.NA/recent)
+
+<p align-"center">
+    <img src="info/rola.png">
+</p>
