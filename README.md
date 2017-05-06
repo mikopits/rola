@@ -42,6 +42,6 @@ Research
 * arXiv.org
   * [Numerical Analysis Category](https://arxiv.org/list/math.NA/recent)
 
-<p align-"center">
+<p align="center">
     <img src="info/rola.png">
 </p>

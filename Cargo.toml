@@ -1,6 +1,8 @@
 [package]
 name = "rola"
-version = "0.1.0"
+version = "0.0.1"
 authors = ["mikopits <mikopits@gmail.com>"]
 
 [dependencies]
+num = "0.1"
+scoped_threadpool = "0.1"
