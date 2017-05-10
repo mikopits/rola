@@ -5,4 +5,3 @@ authors = ["mikopits <mikopits@gmail.com>"]
 
 [dependencies]
 num = "0.1"
-scoped_threadpool = "0.1"
