@@ -12,10 +12,13 @@ use matrix::{Matrix, /*Flag,*/ ReadOrder};
 use std::sync::{Once, ONCE_INIT};
 
 struct OpenCLHandler {
-    platform,
-
+    platform : Platform,
+    device : Device,
+    context : Context,
 }
 
+// TODO: integrate error handling
+//  test
 impl OpenCLHandler {
     //
     //  Singleton impl of opencl objects for preprocessed access
@@ -50,7 +53,7 @@ impl OpenCLHandler {
              let dims  = matrix.m * matrix.n;
              let buffer = Buffer::<f32>::builder()
                  .queue(queue.clone())
-                 .flags(flags::MEM_READ_WRITE | flags::MEM_COPY_HOST_PTR)
+                 .flags(flags::MEM_READ_WRITE | flags::MEM_COPY_HOST_PTR) // CL::<flags>
                  .dims(dims)
                  .host_data(&matrix.mat)
                  .build().unwrap();
