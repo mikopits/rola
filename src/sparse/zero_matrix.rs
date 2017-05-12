@@ -7,12 +7,12 @@ use matrix::Matrix;
 pub struct ZeroMatrix<T> {
     m: usize,
     n: usize,
-    phantom_data: PhantomData<T>,
+    mat: PhantomData<T>,
 }
 
 impl<T: Clone + Num + Zero> ZeroMatrix<T> {
     pub fn new(m: usize, n: usize) -> ZeroMatrix<T> {
-        ZeroMatrix { m, n, phantom_data: PhantomData }
+        ZeroMatrix { m, n, mat: PhantomData }
     }
 }
 

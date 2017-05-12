@@ -14,7 +14,7 @@ pub struct SparseMatrix<T> {
 }
 
 impl<T: Clone + Num + Zero> SparseMatrix<T> {
-    /// Create a new sparse matrix from a hashmap of index tuples to `Num`.
+    /// Create a new sparse matrix from a `HashMap` of index tuples to `Num`.
     #[inline]
     pub fn new(mat: HashMap<(usize, usize), T>, m: usize, n: usize)
         -> SparseMatrix<T>
@@ -25,6 +25,23 @@ impl<T: Clone + Num + Zero> SparseMatrix<T> {
         }
     }
 
+    /// Create a new sparse matrix from a `Vec` of tuples containing the
+    /// the indeces of the element and the number in the order (i, j, a_ij).
+    #[inline]
+    pub fn from_tuple(mat: Vec<(usize, usize, T)>, m: usize, n: usize)
+        -> SparseMatrix<T>
+    {
+        let mut map: HashMap<(usize, usize), T> = HashMap::new();
+        for (i, j, a_ij) in mat {
+            map.insert((i, j), a_ij);
+        }
+        SparseMatrix {
+            read_order: ReadOrder::RowMajor,
+            m, n,
+            mat: map,
+        }
+    }
+
     /// Flip the read order. Toggles between row major and column major.
     #[inline]
     pub fn flip_read_order(mut self) -> Self {
@@ -32,6 +49,13 @@ impl<T: Clone + Num + Zero> SparseMatrix<T> {
             ReadOrder::RowMajor => ReadOrder::ColMajor,
             ReadOrder::ColMajor => ReadOrder::RowMajor,
         };
+        self
+    }
+
+    /// Set an element given its indices and a value.
+    #[inline]
+    pub fn set(&mut self, i: usize, j: usize, a_ij: T) -> &mut Self {
+        self.mat.insert((i, j), a_ij);
         self
     }
 }

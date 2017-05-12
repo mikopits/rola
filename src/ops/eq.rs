@@ -114,6 +114,22 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
     }
 }
 
+impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
+    PartialEq<SparseMatrix<T>> for DenseMatrix<T>
+{
+    fn eq(&self, other: &SparseMatrix<T>) -> bool {
+        if self.dims() != other.dims() { return false }
+        for i in 0..self.rows() {
+            for j in 0..self.cols() {
+                if self.element(i, j) != other.element(i, j) {
+                    return false
+                }
+            }
+        }
+        true
+    }
+}
+
 impl<T: Clone + Num + One + Zero + ToPrimitive + FromPrimitive>
     PartialEq<IdentityMatrix<T>> for SparseMatrix<T>
 {

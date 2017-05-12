@@ -6,12 +6,12 @@ use matrix::Matrix;
 #[derive(Clone, Debug)]
 pub struct IdentityMatrix<T> {
     n: usize,
-    phantom_data: PhantomData<T>,
+    mat: PhantomData<T>,
 }
 
 impl<T: Num + One + Zero> IdentityMatrix<T> {
     pub fn new(n: usize) -> IdentityMatrix<T> {
-        IdentityMatrix { n, phantom_data: PhantomData }
+        IdentityMatrix { n, mat: PhantomData }
     }
 }
 
