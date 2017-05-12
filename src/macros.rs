@@ -17,6 +17,9 @@ macro_rules! eye {
 
 #[macro_export]
 macro_rules! sparse {
+    ($vec:expr; $m:expr, $n:expr) => {
+        $crate::SparseMatrix::from_tuple($vec, $m, $n)
+    };
     ($($tup:expr),+; $m:expr, $n:expr) => {
         $crate::SparseMatrix::from_tuple(vec![$($tup),+], $m, $n)
     };

@@ -1,7 +1,7 @@
 use std::fmt;
 use std::marker::PhantomData;
-use num::{Num, FromPrimitive, One, Zero};
-use matrix::Matrix;
+use ::{FromPrimitive, Num, One, Zero};
+use ::Matrix;
 
 #[derive(Clone, Debug)]
 pub struct IdentityMatrix<T> {

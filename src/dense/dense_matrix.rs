@@ -1,24 +1,22 @@
-//use std::collections::HashSet;
 use std::fmt;
+use std::cell::Cell;
 
-use num::{Num, Zero, ToPrimitive, FromPrimitive};
-
-use matrix::{Matrix, /*Flag,*/ ReadOrder};
+use ::{FromPrimitive, Num, ToPrimitive, Zero};
+use ::{Matrix, ReadOrder};
 
 /// A DenseMatrix is a matrix that contains many data points in
 /// non-concentrated areas. Holds m times n numbers in memory.
 ///
 /// We use row major ordering by default.
 #[derive(Clone, Debug)]
-pub struct DenseMatrix<T> {
+pub struct DenseMatrix<T> where T: Copy {
     pub read_order: ReadOrder,
-    //flags: HashSet<Flag>,
     m: usize,
     n: usize,
-    pub mat: Vec<T>,
+    pub mat: Vec<Cell<T>>,
 }
 
-impl<T: Clone + Num> DenseMatrix<T> {
+impl<T: Clone + Copy + Num> DenseMatrix<T> {
     /// Create a new DenseMatrix given dimensions and its data in a slice of
     /// matrix rows in vec form.
     #[inline]
@@ -36,7 +34,7 @@ impl<T: Clone + Num> DenseMatrix<T> {
         for row in mat {
             if row.len() != n { return Err(::Error::InvalidDimensions) };
             for a in row {
-                flat_mat.push(a.to_owned());
+                flat_mat.push(Cell::new(a.to_owned()));
             }
         }
 
@@ -61,7 +59,8 @@ impl<T: Clone + Num> DenseMatrix<T> {
                 Some(ro) => ro,
                 None => ReadOrder::RowMajor,
             },
-            m, n, mat
+            m, n,
+            mat: mat.iter().map(|&a| Cell::new(a)).collect(),
         }
     }
 
@@ -72,9 +71,8 @@ impl<T: Clone + Num> DenseMatrix<T> {
     {
         DenseMatrix{
             read_order: ReadOrder::default(),
-            //flags: HashSet::new(),
             m, n,
-            mat: vec![T::from_usize(0 as usize).unwrap(); m*n]
+            mat: vec![Cell::new(T::from_usize(0 as usize).unwrap()); m*n],
         }
     }
 
@@ -83,9 +81,9 @@ impl<T: Clone + Num> DenseMatrix<T> {
     pub fn identity(n: usize) -> DenseMatrix<T>
         where T: FromPrimitive,
     {
-        let mut mat = vec![T::from_usize(0 as usize).unwrap(); n*n];
+        let mut mat = vec![Cell::new(T::from_usize(0 as usize).unwrap()); n*n];
         for i in 0..n {
-            mat[i*n + i] = T::from_usize(1 as usize).unwrap();
+            mat[i*n + i] = Cell::new(T::from_usize(1 as usize).unwrap());
         }
 
         DenseMatrix{
@@ -105,7 +103,7 @@ impl<T: Clone + Num> DenseMatrix<T> {
     }
 }
 
-impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
+impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
     Matrix<T> for DenseMatrix<T>
 {
     fn is_symmetric(&self) -> bool {
@@ -176,13 +174,13 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
         let mut i = 0;
         while i < self.n * self.m {
             trace = trace +
-                self.mat.get(i).expect("DenseMatrix::trace").clone();
+                self.mat.get(i).expect("DenseMatrix::trace").get();
             i += self.n + 1;
         }
         trace
     }
 
-    // For now, never do in-memory swapping.
+    // TODO: For now, never do in-memory swapping.
     fn transpose(self) -> Self {
         self.flip_read_order()
     }
@@ -209,12 +207,12 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
             ReadOrder::RowMajor => {
                 Some(self.mat.get(self.n*i + j)
                     .expect("DenseMatrix::element")
-                    .clone())
+                    .get())
             },
             ReadOrder::ColMajor => {
                 Some(self.mat.get(self.m*j + i)
                     .expect("DenseMatrix::element")
-                    .clone())
+                    .get())
             },
         }
     }
@@ -222,11 +220,11 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
     /// Get the elements of the matrix as a Vec.
     /// Returns the elements in row major order.
     fn elements(&self) -> Vec<T> {
-        self.mat.clone()
+        self.mat.iter().map(|c| c.get()).collect()
     }
 }
 
-impl<T: Clone + Num + ToPrimitive + FromPrimitive>
+impl<T: Clone + Copy + Num + ToPrimitive + FromPrimitive>
     IntoIterator for DenseMatrix<T> {
     type Item = T;
     type IntoIter = DenseMatrixIntoIterator<T>;
@@ -236,18 +234,18 @@ impl<T: Clone + Num + ToPrimitive + FromPrimitive>
     }
 }
 
-impl<T> fmt::Display for DenseMatrix<T> {
+impl<T: Copy> fmt::Display for DenseMatrix<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "DenseMatrix(m: {}, n: {})", self.m, self.n)
     }
 }
 
-pub struct DenseMatrixIntoIterator<T> {
+pub struct DenseMatrixIntoIterator<T> where T: Copy {
     mat: DenseMatrix<T>,
     index: usize,
 }
 
-impl<T: Clone + Num + ToPrimitive + FromPrimitive>
+impl<T: Clone + Copy + Num + ToPrimitive + FromPrimitive>
     Iterator for DenseMatrixIntoIterator<T> {
     type Item = T;
 
@@ -259,13 +257,13 @@ impl<T: Clone + Num + ToPrimitive + FromPrimitive>
                     result = Some(self.mat.mat.get(self.index /
                                   self.mat.n + self.index % self.mat.n)
                                   .expect("DenseMatrixIntoIterator::next")
-                                  .clone());
+                                  .get());
                 },
                 ReadOrder::ColMajor => {
                     result = Some(self.mat.mat.get(self.index /
                                   self.mat.m + self.index % self.mat.m)
                                   .expect("DenseMatrixIntoIterator::next")
-                                  .clone());
+                                  .get());
                 },
             }
         }

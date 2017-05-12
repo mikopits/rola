@@ -1,19 +1,21 @@
+use std::cell::{Cell, RefCell};
 use std::collections::HashMap;
 use std::fmt;
+use std::rc::Rc;
 
-use num::{Num, Zero};
-
-use matrix::{Matrix, ReadOrder};
+use ::{Num, Zero};
+use ::{Matrix, ReadOrder};
 
 #[derive(Clone, Debug)]
-pub struct SparseMatrix<T> {
+pub struct SparseMatrix<T> where T: Copy {
     pub read_order: ReadOrder,
     m: usize,
     n: usize,
-    pub mat: HashMap<(usize, usize), T>,
+    pub mat: Rc<RefCell<HashMap<(usize, usize), Cell<T>>>>,
 }
 
-impl<T: Clone + Num + Zero> SparseMatrix<T> {
+impl<T: Clone + Copy + Num + Zero> SparseMatrix<T> {
+    /*
     /// Create a new sparse matrix from a `HashMap` of index tuples to `Num`.
     #[inline]
     pub fn new(mat: HashMap<(usize, usize), T>, m: usize, n: usize)
@@ -21,9 +23,10 @@ impl<T: Clone + Num + Zero> SparseMatrix<T> {
     {
         SparseMatrix {
             read_order: ReadOrder::RowMajor,
-            m, n, mat,
+            m, n,
+            mat: Cell::new(mat),
         }
-    }
+    }*/
 
     /// Create a new sparse matrix from a `Vec` of tuples containing the
     /// the indeces of the element and the number in the order (i, j, a_ij).
@@ -31,14 +34,14 @@ impl<T: Clone + Num + Zero> SparseMatrix<T> {
     pub fn from_tuple(mat: Vec<(usize, usize, T)>, m: usize, n: usize)
         -> SparseMatrix<T>
     {
-        let mut map: HashMap<(usize, usize), T> = HashMap::new();
+        let mut map: HashMap<(usize, usize), Cell<T>> = HashMap::new();
         for (i, j, a_ij) in mat {
-            map.insert((i, j), a_ij);
+            map.insert((i, j), Cell::new(a_ij));
         }
         SparseMatrix {
             read_order: ReadOrder::RowMajor,
             m, n,
-            mat: map,
+            mat: Rc::new(RefCell::new(map)),
         }
     }
 
@@ -54,13 +57,13 @@ impl<T: Clone + Num + Zero> SparseMatrix<T> {
 
     /// Set an element given its indices and a value.
     #[inline]
-    pub fn set(&mut self, i: usize, j: usize, a_ij: T) -> &mut Self {
-        self.mat.insert((i, j), a_ij);
+    pub fn set(&self, i: usize, j: usize, a_ij: T) -> &Self {
+        self.mat.borrow_mut().insert((i, j), Cell::new(a_ij));
         self
     }
 }
 
-impl<T: Clone + Num + Zero> Matrix<T> for SparseMatrix<T> {
+impl<T: Clone + Copy + Num + Zero> Matrix<T> for SparseMatrix<T> {
     fn is_symmetric(&self) -> bool {
         // TODO stub
         false
@@ -72,7 +75,7 @@ impl<T: Clone + Num + Zero> Matrix<T> for SparseMatrix<T> {
     }
 
     fn is_diagonal(&self) -> bool {
-        for &(i, j) in self.mat.keys() {
+        for &(i, j) in self.mat.borrow().keys() {
             if i != j { return false }
         }
         true
@@ -152,8 +155,8 @@ impl<T: Clone + Num + Zero> Matrix<T> for SparseMatrix<T> {
 
     fn element(&self, i: usize, j: usize) -> Option<T> {
         if i > self.m && j > self.n { return None }
-        match self.mat.get(&(i, j)) {
-            Some(v) => Some(v.clone()),
+        match self.mat.borrow().get(&(i, j)) {
+            Some(v) => Some(v.get()),
             None => Some(Zero::zero()),
         }
     }
@@ -170,7 +173,7 @@ impl<T: Clone + Num + Zero> Matrix<T> for SparseMatrix<T> {
     }
 }
 
-impl<T: Clone + Num + Zero> IntoIterator for SparseMatrix<T> {
+impl<T: Clone + Copy + Num + Zero> IntoIterator for SparseMatrix<T> {
     type Item = T;
     type IntoIter = SparseMatrixIntoIterator<T>;
 
@@ -179,19 +182,19 @@ impl<T: Clone + Num + Zero> IntoIterator for SparseMatrix<T> {
     }
 }
 
-impl<T> fmt::Display for SparseMatrix<T> {
+impl<T: Copy> fmt::Display for SparseMatrix<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f, "SparseMatrix(m: {}, n: {})", self.m, self.n)
     }
 }
 
-pub struct SparseMatrixIntoIterator<T> {
+pub struct SparseMatrixIntoIterator<T> where T: Copy {
     mat: SparseMatrix<T>,
     i: usize,
     j: usize,
 }
 
-impl<T: Clone + Num + Zero> Iterator for SparseMatrixIntoIterator<T> {
+impl<T: Clone + Copy + Num + Zero> Iterator for SparseMatrixIntoIterator<T> {
     type Item = T;
 
     fn next(&mut self) -> Option<T> {

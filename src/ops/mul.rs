@@ -1,7 +1,6 @@
 use std::ops::Mul;
 
-use num::{FromPrimitive, Num, ToPrimitive};
-
+use ::{FromPrimitive, Num, ToPrimitive};
 use ::{DenseMatrix, IdentityMatrix, Matrix, SparseMatrix, ZeroMatrix};
 
 static MUL_DIM_ERROR: &str = "Cannot multiply matrices of given dimensions";
@@ -18,6 +17,7 @@ macro_rules! zero_mul_impl {
     ($($t:ty)*) => ($(
         impl<T: Clone + Num + FromPrimitive + ToPrimitive>
             Mul<$t> for ZeroMatrix<T>
+            where T: Copy,
         {
             type Output = ZeroMatrix<T>;
 

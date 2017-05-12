@@ -1,5 +1,4 @@
-use num::{Num, One, Zero, FromPrimitive, ToPrimitive};
-
+use ::{FromPrimitive, Num, One, ToPrimitive, Zero};
 use ::{DenseMatrix, IdentityMatrix, Matrix, SparseMatrix, ZeroMatrix};
 
 impl<T: Clone + Num + ToPrimitive + FromPrimitive>
@@ -20,15 +19,24 @@ impl<T: Clone + Num + ToPrimitive + FromPrimitive>
 
 impl<T: Clone + Num + ToPrimitive + FromPrimitive>
     PartialEq for DenseMatrix<T>
+    where T: Copy,
 {
     fn eq(&self, other: &DenseMatrix<T>) -> bool {
         if self.dims() != other.dims() { return false }
-        self.mat == other.mat
+        for i in 0..self.rows() {
+            for j in 0..self.cols() {
+                if self.element(i, j) != other.element(i, j) {
+                    return false
+                }
+            }
+        }
+        true
     }
 }
 
 impl<T: Clone + Num + One + ToPrimitive + FromPrimitive>
     PartialEq<IdentityMatrix<T>> for DenseMatrix<T>
+    where T: Copy,
 {
     fn eq(&self, other: &IdentityMatrix<T>) -> bool {
         if self.dims() != other.dims() { return false }
@@ -42,6 +50,7 @@ impl<T: Clone + Num + One + ToPrimitive + FromPrimitive>
 
 impl<T: Clone + Num + One + ToPrimitive + FromPrimitive>
     PartialEq<DenseMatrix<T>> for IdentityMatrix<T>
+    where T: Copy,
 {
     fn eq(&self, other: &DenseMatrix<T>) -> bool {
         if self.dims() != other.dims() { return false }
@@ -55,25 +64,21 @@ impl<T: Clone + Num + One + ToPrimitive + FromPrimitive>
 
 impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
     PartialEq<ZeroMatrix<T>> for DenseMatrix<T>
+    where T: Copy,
 {
     fn eq(&self, other: &ZeroMatrix<T>) -> bool {
         if self.dims() != other.dims() { return false }
-        for a in &self.mat {
-            if a != &T::zero() { return false }
-        }
-        true
+        self.elements().iter().all(|&a| a == T::zero())
     }
 }
 
 impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
     PartialEq<DenseMatrix<T>> for ZeroMatrix<T>
+    where T: Copy,
 {
     fn eq(&self, other: &DenseMatrix<T>) -> bool {
         if self.dims() != other.dims() { return false }
-        for a in &other.mat {
-            if a != &T::zero() { return false }
-        }
-        true
+        other.elements().iter().all(|&a| a == T::zero())
     }
 }
 
@@ -81,6 +86,28 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
     PartialEq<IdentityMatrix<T>> for ZeroMatrix<T>
 {
     fn eq(&self, _other: &IdentityMatrix<T>) -> bool { false }
+}
+
+impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
+    PartialEq<SparseMatrix<T>> for ZeroMatrix<T>
+{
+    fn eq(&self, other: &SparseMatrix<T>) -> bool {
+        if self.dims() != other.dims() { return false }
+        other.mat.borrow().values().all(|ref c| c.get() == T::zero())
+    }
+}
+
+impl<T: Clone + Copy + Num + One + ToPrimitive + FromPrimitive>
+    PartialEq<SparseMatrix<T>> for IdentityMatrix<T>
+{
+    fn eq(&self, other: &SparseMatrix<T>) -> bool {
+        if self.dims() != other.dims() { return false }
+        if !other.is_diagonal() { return false }
+        for i in 0..self.rows() {
+            if other.element(i, i).unwrap() != One::one() { return false }
+        }
+        true
+    }
 }
 
 impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
@@ -91,15 +118,24 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
 
 impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
     PartialEq for SparseMatrix<T>
+    where T: Copy,
 {
     fn eq(&self, other: &SparseMatrix<T>) -> bool {
         if self.dims() != other.dims() { return false }
-        self.mat == other.mat
+        if self.mat.borrow().keys().len() != other.mat.borrow().keys().len() {
+            return false
+        }
+        for (&(i1, j1), &(i2, j2)) in self.mat.borrow().keys()
+            .zip(other.mat.borrow().keys()) {
+            if self.element(i1, j1) != other.element(i2, j2) { return false }
+        }
+        true
     }
 }
 
 impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
     PartialEq<DenseMatrix<T>> for SparseMatrix<T>
+    where T: Copy,
 {
     fn eq(&self, other: &DenseMatrix<T>) -> bool {
         if self.dims() != other.dims() { return false }
@@ -116,6 +152,7 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
 
 impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
     PartialEq<SparseMatrix<T>> for DenseMatrix<T>
+    where T: Copy,
 {
     fn eq(&self, other: &SparseMatrix<T>) -> bool {
         if self.dims() != other.dims() { return false }
@@ -132,6 +169,7 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
 
 impl<T: Clone + Num + One + Zero + ToPrimitive + FromPrimitive>
     PartialEq<IdentityMatrix<T>> for SparseMatrix<T>
+    where T: Copy,
 {
     fn eq(&self, other: &IdentityMatrix<T>) -> bool {
         if self.dims() != other.dims() { return false }
@@ -143,7 +181,7 @@ impl<T: Clone + Num + One + Zero + ToPrimitive + FromPrimitive>
     }
 }
 
-impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
+impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
     PartialEq<ZeroMatrix<T>> for SparseMatrix<T>
 {
     fn eq(&self, other: &ZeroMatrix<T>) -> bool {
@@ -158,22 +196,15 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
-    use std::collections::HashMap;
-    use ::{DenseMatrix, IdentityMatrix, Matrix, SparseMatrix, ZeroMatrix};
+    use ::{IdentityMatrix, Matrix, ZeroMatrix};
 
     #[test]
     fn test_eq_dense_identity() {
-        let mat1 = vec![vec![1, 0, 0],
-                        vec![0, 1, 0],
-                        vec![0, 0, 1]];
-        let mat2 = vec![vec![1, 1, 0],
-                        vec![0, 1, 0],
-                        vec![0, 0, 1]];
-        let A1 = DenseMatrix::new(&mat1).unwrap();
+        let A1 = dense![1, 0, 0; 0, 1, 0; 0, 0, 1].unwrap();
         assert!(A1.is_diagonal());
-        let A2 = DenseMatrix::new(&mat2).unwrap();
+        let A2 = dense![1, 1, 0; 0, 1, 0; 0, 0, 1].unwrap();
         assert!(!A2.is_diagonal());
-        let I = IdentityMatrix::new(3);
+        let I = eye!(3);
         assert_eq!(A1, I);
         assert_eq!(I, A1);
         assert_ne!(A2, I);
@@ -182,15 +213,9 @@ mod tests {
 
     #[test]
     fn test_eq_dense_zero() {
-        let mat1 = vec![vec![0, 0, 0],
-                        vec![0, 0, 0],
-                        vec![0, 0, 0]];
-        let mat2 = vec![vec![0, 0, 0],
-                        vec![0, 1, 0],
-                        vec![0, 0, 0]];
-        let A1 = DenseMatrix::new(&mat1).unwrap();
-        let A2 = DenseMatrix::new(&mat2).unwrap();
-        let Z = ZeroMatrix::new(3, 3);
+        let A1 = dense![0, 0, 0; 0, 0, 0; 0, 0, 0].unwrap();
+        let A2 = dense![0, 0, 0; 0, 1, 0; 0, 0, 0].unwrap();
+        let Z = zeros!(3, 3);
         assert_eq!(A1, Z);
         assert_eq!(Z, A1);
         assert_ne!(A2, Z);
@@ -199,9 +224,9 @@ mod tests {
 
     #[test]
     fn test_eq_zero_zero() {
-        let Z1: ZeroMatrix<usize> = ZeroMatrix::new(4, 20);
-        let Z2 = ZeroMatrix::new(4, 20);
-        let Z3 = ZeroMatrix::new(20, 4);
+        let Z1: ZeroMatrix<usize> = zeros!(4, 20);
+        let Z2 = zeros!(4, 20);
+        let Z3 = zeros!(20, 4);
         assert_eq!(Z1, Z2);
         assert_eq!(Z2, Z1);
         assert_ne!(Z1, Z3);
@@ -210,9 +235,9 @@ mod tests {
 
     #[test]
     fn test_eq_ident_ident() {
-        let I1: IdentityMatrix<usize> = IdentityMatrix::new(10000000);
-        let I2 = IdentityMatrix::new(10000000);
-        let I3 = IdentityMatrix::new(10000001);
+        let I1: IdentityMatrix<usize> = eye!(10000000);
+        let I2 = eye!(10000000);
+        let I3 = eye!(10000001);
         assert_eq!(I1, I2);
         assert_eq!(I2, I1);
         assert_ne!(I1, I3);
@@ -221,38 +246,42 @@ mod tests {
 
     #[test]
     fn test_eq_ident_zero() {
-        let I: IdentityMatrix<usize> = IdentityMatrix::new(100);
-        let Z = ZeroMatrix::new(100, 100);
+        let I: IdentityMatrix<usize> = eye!(100);
+        let Z = zeros!(100, 100);
         assert_ne!(I, Z);
         assert_ne!(Z, I);
     }
 
     #[test]
     fn test_sparse_eq() {
-        let mat_zero: HashMap<(usize, usize), usize> = HashMap::new();
-        let A_z = SparseMatrix::new(mat_zero, 100, 200);
-        let Z = ZeroMatrix::new(100, 200);
+        let v_0: Vec<(usize, usize, usize)> = Vec::new();
+        let A_z = sparse![v_0; 100, 200];
+        let Z = zeros!(100, 200);
         assert_eq!(A_z, Z);
-        let mut mat_eye = HashMap::new();
+        assert_eq!(Z, A_z);
+
+        let mut mat_eye = Vec::new();
         for i in 0..100 {
-            mat_eye.insert((i, i), 1);
+            mat_eye.push((i, i, 1));
         }
-        let A_i = SparseMatrix::new(mat_eye, 100, 100);
-        let I = IdentityMatrix::new(100);
+        let A_i = sparse![mat_eye; 100, 100];
+        let I = eye!(100);
         assert_eq!(A_i, I);
-        let mut mat_sparse = HashMap::new();
+        assert_eq!(I, A_i);
+
+        let mut mat_sparse = Vec::new();
         for j in 0..5 {
             for i in 0..5 {
-                mat_sparse.insert((i, j), i+j);
+                mat_sparse.push((i, j, i+j));
             }
         }
-        let mat_dense = vec![vec![0, 1, 2, 3, 4],
-                             vec![1, 2, 3, 4, 5],
-                             vec![2, 3, 4, 5, 6],
-                             vec![3, 4, 5, 6, 7],
-                             vec![4, 5, 6, 7, 8]];
-        let A_s = SparseMatrix::new(mat_sparse, 5, 5);
-        let A_d = DenseMatrix::new(&mat_dense).unwrap();
+        let A_d = dense![0, 1, 2, 3, 4;
+                         1, 2, 3, 4, 5;
+                         2, 3, 4, 5, 6;
+                         3, 4, 5, 6, 7;
+                         4, 5, 6, 7, 8].unwrap();
+        let A_s = sparse![mat_sparse; 5, 5];
         assert_eq!(A_s, A_d);
+        assert_eq!(A_d, A_s);
     }
 }

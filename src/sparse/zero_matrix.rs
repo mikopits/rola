@@ -1,7 +1,8 @@
 use std::fmt;
 use std::marker::PhantomData;
-use num::{Num, Zero};
-use matrix::Matrix;
+
+use ::{Num, Zero};
+use ::Matrix;
 
 #[derive(Clone, Debug)]
 pub struct ZeroMatrix<T> {
