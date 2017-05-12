@@ -10,8 +10,8 @@ macro_rules! dense {
 
 #[macro_export]
 macro_rules! eye {
-    ($e:expr) => {
-        $crate::IdentityMatrix::new($e)
+    ($n:expr) => {
+        $crate::IdentityMatrix::new($n)
     };
 }
 
