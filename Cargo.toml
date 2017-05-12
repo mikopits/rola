@@ -2,6 +2,8 @@
 name = "rola"
 version = "0.0.1"
 authors = ["mikopits <mikopits@gmail.com>"]
+license = "MIT/Apache-2.0"
+repository = "https://github.com/mikopits/rola"
 
 [dependencies]
 num = "0.1"
