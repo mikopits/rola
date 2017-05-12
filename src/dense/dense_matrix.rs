@@ -11,7 +11,7 @@ use matrix::{Matrix, /*Flag,*/ ReadOrder};
 /// We use row major ordering by default.
 #[derive(Clone, Debug)]
 pub struct DenseMatrix<T> {
-    read_order: ReadOrder,
+    pub read_order: ReadOrder,
     //flags: HashSet<Flag>,
     m: usize,
     n: usize,
@@ -208,13 +208,13 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
         match self.read_order {
             ReadOrder::RowMajor => {
                 Some(self.mat.get(self.n*i + j)
-                     .expect("DenseMatrix::element")
-                     .clone())
+                    .expect("DenseMatrix::element")
+                    .clone())
             },
             ReadOrder::ColMajor => {
                 Some(self.mat.get(self.m*j + i)
-                     .expect("DenseMatrix::element")
-                     .clone())
+                    .expect("DenseMatrix::element")
+                    .clone())
             },
         }
     }

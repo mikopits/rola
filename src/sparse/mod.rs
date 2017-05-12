@@ -1,14 +1,16 @@
 pub use self::identity_matrix::IdentityMatrix;
+pub use self::sparse_matrix::SparseMatrix;
 pub use self::zero_matrix::ZeroMatrix;
 
 mod identity_matrix;
+mod sparse_matrix;
 mod zero_matrix;
 
 #[cfg(test)]
 mod tests {
+    #![allow(non_snake_case)]
     use sparse::{IdentityMatrix, ZeroMatrix};
 
-    #[allow(non_snake_case)]
     #[test]
     fn test_identity_iter() {
         let I2 = IdentityMatrix::new(2);
@@ -20,7 +22,6 @@ mod tests {
         assert_eq!(iter.next(), None);
     }
 
-    #[allow(non_snake_case)]
     #[test]
     fn test_zero_iter() {
         let Z2 = ZeroMatrix::new(2, 2);

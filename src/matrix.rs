@@ -1,6 +1,6 @@
 use std::cmp;
 
-pub trait Matrix<T>: IntoIterator<Item = T> /*+ PartialEq*/ + Sized /*+ Add + Mul*/ {
+pub trait Matrix<T>: IntoIterator<Item = T> + Sized {
 
     // TODO: allow num::Complex.
     ///// Check if the matrix is Hermitian.
@@ -87,7 +87,7 @@ pub trait Matrix<T>: IntoIterator<Item = T> /*+ PartialEq*/ + Sized /*+ Add + Mu
     #[inline]
     fn cols(&self) -> usize;
 
-    /// Get the matrix element at (i, j).
+    /// Get a reference to the matrix element at (i, j).
     #[inline]
     fn element(&self, i: usize, j: usize) -> Option<T>;
 

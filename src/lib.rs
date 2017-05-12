@@ -7,7 +7,7 @@ pub use num::traits::*;
 pub use dense::DenseMatrix;
 pub use error::{Error, Result};
 pub use matrix::Matrix;
-pub use sparse::{IdentityMatrix, ZeroMatrix};
+pub use sparse::{IdentityMatrix, SparseMatrix, ZeroMatrix};
 
 mod dense;
 mod error;

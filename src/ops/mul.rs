@@ -2,9 +2,17 @@ use std::ops::Mul;
 
 use num::{FromPrimitive, Num, ToPrimitive};
 
-use ::{DenseMatrix, IdentityMatrix, Matrix, ZeroMatrix};
+use ::{DenseMatrix, IdentityMatrix, Matrix, SparseMatrix, ZeroMatrix};
 
 static MUL_DIM_ERROR: &str = "Cannot multiply matrices of given dimensions";
+
+macro_rules! check_mul_dims {
+    ($self:expr, $rhs:expr) => (
+        if $self.cols() != $rhs.rows() {
+            panic!("{}: lhs={} rhs={}", MUL_DIM_ERROR, $self, $rhs)
+        }
+    )
+}
 
 macro_rules! zero_mul_impl {
     ($($t:ty)*) => ($(
@@ -15,16 +23,14 @@ macro_rules! zero_mul_impl {
 
             #[inline]
             fn mul(self, rhs: $t) -> ZeroMatrix<T> {
-                if self.cols() != rhs.rows() {
-                    panic!("{}: lhs={} rhs={}", MUL_DIM_ERROR, self, rhs)
-                }
+                check_mul_dims! { self, rhs }
                 ZeroMatrix::new(self.rows(), rhs.cols())
             }
         }
     )*)
 }
 
-zero_mul_impl! { DenseMatrix<T> IdentityMatrix<T> ZeroMatrix<T> }
+zero_mul_impl! { DenseMatrix<T> IdentityMatrix<T> SparseMatrix<T> ZeroMatrix<T> }
 
 #[cfg(test)]
 mod tests {
