@@ -5,3 +5,5 @@ authors = ["mikopits <mikopits@gmail.com>"]
 
 [dependencies]
 num = "0.1"
+ocl = "0.13"
+libc = "^0.1.8"
