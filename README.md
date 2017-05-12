@@ -9,7 +9,12 @@ computing.
 The scope of the project is to create fast, robust matrix and vector
 operations, and to solve ``Ax = b`` as quickly and efficiently as possible.
 
-# Goals
+## Current Progress
+
+Just trying to get things to work. We'll worry about optimization after we
+have a working implementation.
+
+## Goals
 
 1. Idiomatic, clean Rust
 2. Mathematically sound
