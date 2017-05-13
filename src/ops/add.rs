@@ -3,6 +3,8 @@ use std::ops::Add;
 use ::{FromPrimitive, Num, ToPrimitive};
 use ::{DenseMatrix, IdentityMatrix, Matrix, SparseMatrix, ZeroMatrix};
 
+
+
 static ADD_DIM_ERROR: &str = "Cannot add matrices of given dimensions";
 
 macro_rules! check_add_dims {
@@ -31,6 +33,43 @@ macro_rules! zero_add_impl {
 }
 
 zero_add_impl! { DenseMatrix<T> IdentityMatrix<T> SparseMatrix<T> ZeroMatrix<T> }
+
+// TODO: add kernels here
+// impl Ops for DenseMatrix<T>
+// {
+//     fn add_kernel(){
+//
+//     }
+//
+//
+//     fn generate_kernel_config(&self, source : &String){
+//
+//     }
+// }
+//
+// impl Ops for SparseMatrix<T>
+// {
+//     fn add_kernel(){
+//
+//     }
+//
+//
+//     fn generate_kernel_config(&self, source : &String){
+//
+//     }
+// }
+//
+// impl Ops for ZeroMatrix<T>
+// {
+//     fn add_kernel(){
+//
+//     }
+//
+//
+//     fn generate_kernel_config(&self, source : &String){
+//
+//     }
+// }
 
 impl<T: Clone + Num + FromPrimitive + ToPrimitive> Add for DenseMatrix<T>
     where T: Copy,

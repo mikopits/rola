@@ -1,15 +1,15 @@
 extern crate ocl;
-use ocl::ProQue;
-use ocl::{flags, Platform, Device, Context, Queue, Program,
-        Buffer, Kernel, Event, EventList};
 
-use opencl::mem::CLBuffer;
 use std::fmt;
 use std::ptr;
 use std::{mem, thread};
 
+use ocl::ProQue;
+use ocl::{flags, Platform, Device, Context, Queue, Program,
+        Buffer, Kernel, Event, EventList};
+
 use matrix::{Matrix, /*Flag,*/ ReadOrder};
-use std::sync::{Once, ONCE_INIT};
+
 
 struct OpenCLHandler {
     platform : Platform,
@@ -20,25 +20,32 @@ struct OpenCLHandler {
 // TODO: integrate error handling
 //  test
 impl OpenCLHandler {
-    //
-    //  Singleton impl of opencl objects for preprocessed access
-    //
+
+    ////////////////////////////////////////////////////////////////////////////////
+    // OpenCLHandler -> handles call from
+    ////////////////////////////////////////////////////////////////////////////////
     pub fn new(&self) -> OpenCLHandler
     {
         // only call to self.opencl_components once
-        unsafe {
-            INIT.call_once(|| {
-                self.platform = Platform::default();
-                self.device = Device::first(self.platform);
-                self.context = Context::builder()
-                    .platform(self.platform)
-                    .devices(self.device.clone())
-                    .build().unwrap();
-            });
-        }
+        self.platform = Platform::default();
+        self.device = Device::first(self.platform);
+        self.context = Context::builder()
+            .platform(self.platform)
+            .devices(self.device.clone())
+            .build().unwrap();
     }
 
-    pub fn run(src: String, kernel_fn: String, kernel_args: &[Matrix], resultant_mat: &mut Matrix)
+    ////////////////////////////////////////////////////////////////////////////////
+    // runs given a source string as kernel program
+    ////////////////////////////////////////////////////////////////////////////////
+
+    /** runs given a source string as kernel program
+    * @param src: kernel program as string
+    * @param kernel_fn: function name of kernel program to runs
+    * @param kernel_args: array of matrices to read to GPU
+    * @param resultant_mat:matrix after operation from GPU to vector object
+    */
+    pub fn run(&self, src: String, kernel_fn: String, kernel_args: &[Matrix], resultant_mat: &mut Matrix)
     {
         let program = Program::builder()
             .devices(self.device)
