@@ -26,13 +26,13 @@ Potentially look into GPU acceleration:
   * https://github.com/luqmana/rust-opencl
   * https://github.com/cogciprocate/ocl
 
-Research
---------
+## Research
 
 #### References
 * [LAPACK](https://github.com/reference-lapack/lapack) FORTRAN, tried and true
 * [Blaze](https://bitbucket.org/blaze-lib/blaze) C++, cutting edge and [fast](https://bitbucket.org/blaze-lib/blaze/wiki/Benchmarks)
 * [Eigen](https://bitbucket.org/eigen/eigen) Pure C++, clean and robust
+* [PLASMA](https://bitbucket.org/icl/plasma) C, makes use of cores and hardware
 
 #### Study Material & Theory
 * Numerical Analysis/Methods
@@ -42,6 +42,8 @@ Research
 * Computation of Eigenvalues
   * [Olver (UMN)](http://www-users.math.umn.edu/~olver/num_/lnqr.pdf)
   * [gatech](https://www-old.math.gatech.edu/academic/courses/core/math2601/Web-notes/5num.pdf)
+* Matrix Inversion Algorithms
+  * [Fast Algorithms for Sparse Matrix Inverse Computations (Li)](http://mc.stanford.edu/cgi-bin/images/0/04/Li_phd.pdf)
 * Texts
   * [Numerical Analysis (Burden, Faires)](http://ins.sjtu.edu.cn/people/mtang/textbook.pdf)
   * [Numerical Analysis (Scott)](http://people.cs.uchicago.edu/~ridg/newna/nalrs.pdf)

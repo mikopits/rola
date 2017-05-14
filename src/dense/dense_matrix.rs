@@ -40,7 +40,6 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
 
         Ok(DenseMatrix {
             read_order: ReadOrder::default(),
-            //flags: HashSet::new(),
             m, n,
             mat: flat_mat })
     }
@@ -107,9 +106,15 @@ impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
     Matrix<T> for DenseMatrix<T>
 {
     fn is_symmetric(&self) -> bool {
-        // TODO stub
         if !self.is_square() { return false }
-        false
+        for i in 1..self.rows() {
+            for j in 0..i {
+                if self.element(i, j) != self.element(j, i) {
+                    return false
+                }
+            }
+        }
+        true
     }
 
     fn is_orthogonal(&self) -> bool {
