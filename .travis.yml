@@ -1,0 +1,19 @@
+language: rust
+
+sudo: false
+
+rust:
+  - stable
+
+os:
+  - linux
+  - osx
+  - windows
+
+notifications:
+  email: false
+
+cache: cargo
+
+script:
+  - cargo build
