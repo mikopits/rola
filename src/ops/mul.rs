@@ -32,42 +32,6 @@ macro_rules! zero_mul_impl {
 
 zero_mul_impl! { DenseMatrix<T> IdentityMatrix<T> SparseMatrix<T> ZeroMatrix<T> }
 
-// TODO: add kernels here
-// impl Ops for DenseMatrix<T>
-// {
-//     fn mul_kernel(){
-//
-//     }
-//
-//
-//     fn generate_kernel_config(&self, source : &String){
-//
-//     }
-// }
-//
-// impl Ops for SparseMatrix<T>
-// {
-//     fn mul_kernel(){
-//
-//     }
-//
-//
-//     fn generate_kernel_config(&self, source : &String){
-//
-//     }
-// }
-//
-// impl Ops for ZeroMatrix<T>
-// {
-//     fn mul_kernel(){
-//
-//     }
-//
-//
-//     fn generate_kernel_config(&self, source : &String){
-//
-//     }
-
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]

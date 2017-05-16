@@ -1,43 +1,6 @@
 use ::{FromPrimitive, Num, One, ToPrimitive, Zero};
 use ::{DenseMatrix, IdentityMatrix, Matrix, SparseMatrix, ZeroMatrix};
 
-// TODO: add kernels here
-// impl Ops for DenseMatrix<T>
-// {
-//     fn eq_kernel(){
-//
-//     }
-//
-//
-//     fn generate_kernel_config(&self, source : &String){
-//
-//     }
-// }
-//
-// impl Ops for SparseMatrix<T>
-// {
-//     fn eq_kernel(){
-//
-//     }
-//
-//
-//     fn generate_kernel_config(&self, source : &String){
-//
-//     }
-// }
-//
-// impl Ops for ZeroMatrix<T>
-// {
-//     fn eq_kernel(){
-//
-//     }
-//
-//
-//     fn generate_kernel_config(&self, source : &String){
-//
-//     }
-// }
-
 impl<T: Clone + Num + ToPrimitive + FromPrimitive>
     PartialEq for ZeroMatrix<T>
 {

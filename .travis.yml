@@ -7,8 +7,8 @@ rust:
 
 os:
   - linux
-  - osx
-  - windows
+#  - osx
+#  - windows
 
 notifications:
   email: false
