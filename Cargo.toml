@@ -6,4 +6,6 @@ license = "MIT/Apache-2.0"
 repository = "https://github.com/mikopits/rola"
 
 [dependencies]
+libc = "^0.1.8"
 num = "0.1"
+ocl = "0.13"
