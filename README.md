@@ -1,5 +1,6 @@
 # rola
 
+[![Build Status](https://travis-ci.org/mikopits/rola.svg?branch=master)](https://travis-ci.org/mikopits/rola)
 [![Join the chat at https://gitter.im/rola-dev/Lobby](https://badges.gitter.im/rola-dev/Lobby.svg)](https://gitter.im/rola-dev/Lobby?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 Rola (Rust Optimized Linear Algebra) is (will be) a Rust linear algebra
