@@ -111,7 +111,7 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
         if i >= self.rows() { return None }
         let mut v = Vec::with_capacity(self.cols());
         for j in 0..self.cols() {
-            v.push(self.element(i, j).unwrap());
+            v.push(self.get(i, j).unwrap());
         }
         Some(Self::from_vec(v, 1, self.cols(), None).unwrap())
     }
@@ -124,7 +124,7 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
         if j >= self.cols() { return None }
         let mut v = Vec::with_capacity(self.rows());
         for i in 0..self.rows() {
-            v.push(self.element(i, j).unwrap());
+            v.push(self.get(i, j).unwrap());
         }
         Some(Self::from_vec(v, self.rows(), 1, None).unwrap())
     }
@@ -137,7 +137,7 @@ impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
         if !self.is_square() { return false }
         for i in 1..self.rows() {
             for j in 0..i {
-                if self.element(i, j) != self.element(j, i) {
+                if self.get(i, j) != self.get(j, i) {
                     return false
                 }
             }
@@ -154,8 +154,7 @@ impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
         for i in 0..self.m {
             for j in 0..self.n {
                 if i != j {
-                    if self.element(i, j).expect("DenseMatrix::is_diagonal")
-                        != T::zero() { return false }
+                    if self.get(i, j).unwrap() != T::zero() { return false }
                 }
             }
         }
@@ -234,8 +233,8 @@ impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
         }
     }
 
-    /// Get a matrix element at m, n.
-    fn element(&self, i: usize, j: usize) -> Option<T> {
+    /// Get a matrix element at i, j.
+    fn get(&self, i: usize, j: usize) -> Option<T> {
         match self.read_order {
             ReadOrder::RowMajor => {
                 Some(self.mat.get(self.n*i + j)
@@ -246,6 +245,24 @@ impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
                 Some(self.mat.get(self.m*j + i)
                     .expect("DenseMatrix::element")
                     .get())
+            },
+        }
+    }
+
+    /// Set a matrix element at i, j.
+    fn set(&self, i: usize, j: usize, val: T) -> Option<T> {
+        match self.read_order {
+            ReadOrder::RowMajor => {
+                match self.mat.get(self.n*i + j) {
+                    Some(e) => { e.set(val); Some(val) },
+                    None => None,
+                }
+            },
+            ReadOrder::ColMajor => {
+                match self.mat.get(self.m*j + i) {
+                    Some(e) => { e.set(val); Some(val) },
+                    None => None,
+                }
             },
         }
     }
@@ -267,9 +284,9 @@ impl<T: Clone + Copy + Num + ToPrimitive + FromPrimitive>
     }
 }
 
-impl<T: Copy> fmt::Display for DenseMatrix<T> {
+impl<T: Copy + fmt::Debug> fmt::Display for DenseMatrix<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "DenseMatrix(m: {}, n: {})", self.m, self.n)
+        write!(f, "DenseMatrix: {:?}", self.m)
     }
 }
 

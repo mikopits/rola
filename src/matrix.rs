@@ -1,6 +1,6 @@
 use std::cmp;
 
-pub trait Matrix<T>: Sized {
+pub trait Matrix<T>: Sized where T: ::Num + Clone {
 
     // TODO: allow num::Complex.
     ///// Check if the matrix is Hermitian.
@@ -87,9 +87,13 @@ pub trait Matrix<T>: Sized {
     #[inline]
     fn cols(&self) -> usize;
 
-    /// Get a reference to the matrix element at (i, j).
+    /// Get the matrix element at (i, j).
     #[inline]
-    fn element(&self, i: usize, j: usize) -> Option<T>;
+    fn get(&self, i: usize, j: usize) -> Option<T>;
+
+    /// Set the matrix element at (i, j).
+    #[inline]
+    fn set(&self, i: usize, j: usize, val: T) -> Option<T>;
 
     /// Get the matrix elements as a Vec.
     #[inline]
@@ -114,7 +118,7 @@ pub trait Matrix<T>: Sized {
         let min = cmp::min(m, n);
         let mut diags = Vec::with_capacity(min);
         for i in 0..min {
-            diags.push(self.element(i, i).expect("Matrix::diags"));
+            diags.push(self.get(i, i).unwrap());
         }
         diags
     }

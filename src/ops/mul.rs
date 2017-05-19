@@ -10,7 +10,7 @@ static MUL_DIM_ERROR: &str = "Cannot multiply matrices of given dimensions";
 macro_rules! check_mul_dims {
     ($self:expr, $rhs:expr) => (
         if $self.cols() != $rhs.rows() {
-            panic!("{}: lhs={} rhs={}", MUL_DIM_ERROR, $self, $rhs)
+            panic!("{}: lhs={:?} rhs={:?}", MUL_DIM_ERROR, $self, $rhs)
         }
     )
 }
@@ -19,7 +19,7 @@ macro_rules! zero_mul_impl {
     ($($t:ty)*) => ($(
         impl<T: Clone + Num + FromPrimitive + ToPrimitive>
             Mul<$t> for ZeroMatrix<T>
-            where T: Copy,
+            where T: Copy + Debug,
         {
             type Output = ZeroMatrix<T>;
 
@@ -32,7 +32,7 @@ macro_rules! zero_mul_impl {
 
         impl<T: Clone + Num + FromPrimitive + ToPrimitive>
             Mul<ZeroMatrix<T>> for $t
-            where T: Copy,
+            where T: Copy + Debug,
         {
             type Output = ZeroMatrix<T>;
 
@@ -46,7 +46,7 @@ macro_rules! zero_mul_impl {
 }
 
 impl<T: Clone + Num + FromPrimitive + ToPrimitive> Mul for ZeroMatrix<T>
-    where T: Copy,
+    where T: Copy + Debug,
 {
     type Output = ZeroMatrix<T>;
 
@@ -63,7 +63,7 @@ macro_rules! ident_mul_impl {
     ($($t:ty)*) => ($(
         impl<T: Clone + Num + FromPrimitive + ToPrimitive>
             Mul<$t> for IdentityMatrix<T>
-            where T: Copy,
+            where T: Copy + Debug,
         {
             type Output = $t;
 
@@ -76,7 +76,7 @@ macro_rules! ident_mul_impl {
 
         impl<T: Clone + Num + FromPrimitive + ToPrimitive>
             Mul<IdentityMatrix<T>> for $t
-            where T: Copy,
+            where T: Copy + Debug,
         {
             type Output = $t;
 

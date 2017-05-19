@@ -25,7 +25,7 @@ impl<T: Clone + Num + ToPrimitive + FromPrimitive>
         if self.dims() != other.dims() { return false }
         for i in 0..self.rows() {
             for j in 0..self.cols() {
-                if self.element(i, j) != other.element(i, j) {
+                if self.get(i, j) != other.get(i, j) {
                     return false
                 }
             }
@@ -97,14 +97,15 @@ impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
     }
 }
 
-impl<T: Clone + Copy + Num + One + ToPrimitive + FromPrimitive>
+impl<T: Clone + Copy + Num + ToPrimitive + FromPrimitive>
     PartialEq<SparseMatrix<T>> for IdentityMatrix<T>
+    where T: One,
 {
     fn eq(&self, other: &SparseMatrix<T>) -> bool {
         if self.dims() != other.dims() { return false }
         if !other.is_diagonal() { return false }
         for i in 0..self.rows() {
-            if other.element(i, i).unwrap() != One::one() { return false }
+            if other.get(i, i).unwrap() != One::one() { return false }
         }
         true
     }
@@ -127,7 +128,7 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
         }
         for (&(i1, j1), &(i2, j2)) in self.mat.borrow().keys()
             .zip(other.mat.borrow().keys()) {
-            if self.element(i1, j1) != other.element(i2, j2) { return false }
+            if self.get(i1, j1) != other.get(i2, j2) { return false }
         }
         true
     }
@@ -141,7 +142,7 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
         if self.dims() != other.dims() { return false }
         for i in 0..self.rows() {
             for j in 0..self.cols() {
-                if self.element(i, j) != other.element(i, j) {
+                if self.get(i, j) != other.get(i, j) {
                     return false
                 }
             }
@@ -158,7 +159,7 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
         if self.dims() != other.dims() { return false }
         for i in 0..self.rows() {
             for j in 0..self.cols() {
-                if self.element(i, j) != other.element(i, j) {
+                if self.get(i, j) != other.get(i, j) {
                     return false
                 }
             }

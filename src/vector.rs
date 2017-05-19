@@ -1,4 +1,4 @@
-pub trait Vector<T> where T: ::Num + Clone + Copy {
+pub trait Vector<T> where T: ::Num + Clone {
     type Transpose;
 
     /// Transpose the `Vector`.

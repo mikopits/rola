@@ -51,16 +51,9 @@ impl<T: Clone + Copy + Num + Zero> SparseMatrix<T> {
         };
         self
     }
-
-    /// Set an element given its indices and a value.
-    #[inline]
-    pub fn set(&self, i: usize, j: usize, a_ij: T) -> &Self {
-        self.mat.borrow_mut().insert((i, j), Cell::new(a_ij));
-        self
-    }
 }
 
-impl<T: Clone + Copy + Num + Zero> Matrix<T> for SparseMatrix<T> {
+impl<T: Clone + Copy + Num> Matrix<T> for SparseMatrix<T> {
     fn is_symmetric(&self) -> bool {
         // TODO stub
         false
@@ -122,7 +115,7 @@ impl<T: Clone + Copy + Num + Zero> Matrix<T> for SparseMatrix<T> {
         let mut trace = T::zero();
         let mut i = 0;
         loop {
-            match self.element(i, i) {
+            match self.get(i, i) {
                 Some(e) => {
                     trace = trace + e;
                     i += 1;
@@ -150,20 +143,42 @@ impl<T: Clone + Copy + Num + Zero> Matrix<T> for SparseMatrix<T> {
         }
     }
 
-    fn element(&self, i: usize, j: usize) -> Option<T> {
-        if i > self.m && j > self.n { return None }
-        match self.mat.borrow().get(&(i, j)) {
-            Some(v) => Some(v.get()),
-            None => Some(Zero::zero()),
+    fn get(&self, i: usize, j: usize) -> Option<T> where T: Zero {
+        if i >= self.rows() || j >= self.cols() { return None }
+        match self.read_order {
+            ReadOrder::RowMajor => {
+                match self.mat.borrow().get(&(i, j)) {
+                    Some(v) => Some(v.get()),
+                    None => Some(Zero::zero()),
+                }
+            },
+            ReadOrder::ColMajor => {
+                match self.mat.borrow().get(&(j, i)) {
+                    Some(v) => Some(v.get()),
+                    None => Some(Zero::zero()),
+                }
+            },
         }
+    }
+
+    fn set(&self, i: usize, j: usize, val: T) -> Option<T> {
+        if i >= self.rows() || j >= self.cols() { return None }
+        match self.read_order {
+            ReadOrder::RowMajor => {
+                self.mat.borrow_mut().insert((i, j), Cell::new(val));
+            },
+            ReadOrder::ColMajor => {
+                self.mat.borrow_mut().insert((j, i), Cell::new(val));
+            },
+        }
+        Some(val)
     }
 
     fn elements(&self) -> Vec<T> {
         let mut elements: Vec<T> = Vec::with_capacity(self.m*self.n);
         for i in 0..self.m {
             for j in 0..self.n {
-                elements.push(self.element(i, j)
-                              .expect("SparseMatrix::element"));
+                elements.push(self.get(i, j).unwrap());
             }
         }
         elements
@@ -179,9 +194,9 @@ impl<T: Clone + Copy + Num + Zero> IntoIterator for SparseMatrix<T> {
     }
 }
 
-impl<T: Copy> fmt::Display for SparseMatrix<T> {
+impl<T: Copy + fmt::Debug> fmt::Display for SparseMatrix<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "SparseMatrix(m: {}, n: {})", self.m, self.n)
+        write!(f, "SparseMatrix: {:?}", self)
     }
 }
 
@@ -198,14 +213,7 @@ impl<T: Clone + Copy + Num + Zero> Iterator for SparseMatrixIntoIterator<T> {
         let mut result = None;
         if self.j < self.mat.n {
             if self.i < self.mat.m {
-                match self.mat.read_order {
-                    ReadOrder::RowMajor => {
-                        result = self.mat.element(self.i, self.j);
-                    },
-                    ReadOrder::ColMajor => {
-                        result = self.mat.element(self.j, self.i);
-                    },
-                }
+                result = self.mat.get(self.i, self.j);
                 self.i += 1;
             } else {
                 self.i = 0;

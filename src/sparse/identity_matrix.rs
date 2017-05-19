@@ -48,13 +48,19 @@ impl<T: Clone + Num + One + Zero + FromPrimitive> Matrix<T> for IdentityMatrix<T
 
     fn cols(&self) -> usize { self.n }
 
-    fn element(&self, i: usize, j: usize) -> Option<T> {
-        if (0..self.n).any(|x| x == i)
-        && (0..self.n).any(|y| y == j) {
-            if i != j { return Some(Zero::zero()) }
-            return Some(One::one())
+    fn get(&self, i: usize, j: usize) -> Option<T> {
+        if i >= self.rows() || j >= self.cols() { return None }
+        if i != j {
+            Some(Zero::zero())
+        } else {
+            Some(One::one())
         }
-        None
+    }
+
+    fn set(&self, i: usize, j: usize, _val: T) -> Option<T> {
+        if i >= self.rows() || j >= self.cols() { return None }
+        // FIXME: Turn IdentityMatrix into a SparseMatrix.
+        panic!("Cannot set a value in an IdentityMatrix")
     }
 
     fn elements(&self) -> Vec<T> {

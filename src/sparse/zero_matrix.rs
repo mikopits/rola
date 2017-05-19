@@ -50,12 +50,17 @@ impl<T: Clone + Num + Zero> Matrix<T> for ZeroMatrix<T> {
 
     fn cols(&self) -> usize { self.n }
 
-    fn element(&self, i: usize, j: usize) -> Option<T> {
-        if (0..self.m).any(|x| x == i)
-        && (0..self.n).any(|y| y == j) {
+    fn get(&self, i: usize, j: usize) -> Option<T> {
+        if i >= self.rows() || j >= self.cols() {
             return Some(Zero::zero())
         }
         None
+    }
+
+    fn set(&self, i: usize, j: usize, _val: T) -> Option<T> {
+        if i >= self.rows() || j >= self.cols() { return None }
+        // FIXME: Turn the ZeroMatrix into a SparseMatrix.
+        panic!("Cannot set a value in a ZeroMatrix")
     }
 
     fn elements(&self) -> Vec<T> {
