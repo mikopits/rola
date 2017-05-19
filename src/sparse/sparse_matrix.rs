@@ -15,18 +15,15 @@ pub struct SparseMatrix<T> where T: Copy {
 }
 
 impl<T: Clone + Copy + Num + Zero> SparseMatrix<T> {
-    /*
-    /// Create a new sparse matrix from a `HashMap` of index tuples to `Num`.
+    /// Create a new empty sparse matrix.
     #[inline]
-    pub fn new(mat: HashMap<(usize, usize), T>, m: usize, n: usize)
-        -> SparseMatrix<T>
-    {
+    pub fn new(m: usize, n: usize) -> SparseMatrix<T> {
         SparseMatrix {
             read_order: ReadOrder::RowMajor,
             m, n,
-            mat: Cell::new(mat),
+            mat: Rc::new(RefCell::new(HashMap::new())),
         }
-    }*/
+    }
 
     /// Create a new sparse matrix from a `Vec` of tuples containing the
     /// the indeces of the element and the number in the order (i, j, a_ij).

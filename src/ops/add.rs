@@ -49,6 +49,7 @@ impl<T: Clone + Num + FromPrimitive + ToPrimitive> Add for DenseMatrix<T>
             }
         }
         DenseMatrix::from_vec(mat, self.rows(), self.cols(), None)
+            .expect("DenseMatrix::add")
     }
 }
 
@@ -74,7 +75,7 @@ impl<T: Clone + Num + FromPrimitive + ToPrimitive>
         DenseMatrix::from_vec(mat,
                               self.rows(),
                               self.cols(),
-                              Some(self.read_order))
+                              Some(self.read_order)).expect("DenseMatrix::Add")
     }
 }
 
@@ -96,7 +97,7 @@ impl<T: Clone + Num + FromPrimitive + ToPrimitive>
         DenseMatrix::from_vec(mat,
                               self.rows(),
                               self.cols(),
-                              Some(self.read_order))
+                              Some(self.read_order)).expect("DenseMatrix::add")
     }
 }
 

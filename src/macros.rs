@@ -1,7 +1,7 @@
 #[macro_export]
 macro_rules! dense {
     ($elem:expr; $m:expr, $n:expr) => {
-        $crate::DenseMatrix::from_vec(vec![$elem; $m*$n], $m, $n, None)
+        $crate::DenseMatrix::from_vec(vec![$elem; $m*$n], $m, $n, None).unwrap()
     };
     ($($($a:expr),+);+) => {
         $crate::DenseMatrix::new(&[$(vec![$(($a),)+],)+])
@@ -17,6 +17,9 @@ macro_rules! eye {
 
 #[macro_export]
 macro_rules! sparse {
+    ($m:expr, $n:expr) => {
+        $crate::SparseMatrix::new($m, $n)
+    };
     ($vec:expr; $m:expr, $n:expr) => {
         $crate::SparseMatrix::from_tuple($vec, $m, $n)
     };

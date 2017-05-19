@@ -51,16 +51,20 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
     pub fn from_vec(mat: Vec<T>,
                     m: usize,
                     n: usize,
-                    read_order: Option<ReadOrder>) -> DenseMatrix<T>
+                    read_order: Option<ReadOrder>) -> ::Result<DenseMatrix<T>>
     {
-        DenseMatrix {
+        if m*n != mat.len() {
+            return Err(::Error::InvalidDimensions)
+        }
+
+        Ok(DenseMatrix {
             read_order: match read_order {
                 Some(ro) => ro,
                 None => ReadOrder::RowMajor,
             },
             m, n,
             mat: mat.iter().map(|&a| Cell::new(a)).collect(),
-        }
+        })
     }
 
     /// Create a new dense matrix of zeros given the matrix dimensions m and n.
@@ -87,7 +91,6 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
 
         DenseMatrix{
             read_order: ReadOrder::default(),
-            //flags: HashSet::new(),
             m: n, n, mat }
     }
 
