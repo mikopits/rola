@@ -1,6 +1,6 @@
 use std::cmp;
 
-pub trait Matrix<T>: IntoIterator<Item = T> + Sized {
+pub trait Matrix<T>: Sized {
 
     // TODO: allow num::Complex.
     ///// Check if the matrix is Hermitian.

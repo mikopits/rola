@@ -34,3 +34,13 @@ macro_rules! zeros {
         $crate::ZeroMatrix::new($m, $n)
     };
 }
+
+#[macro_export]
+macro_rules! vector {
+    ($elem:expr; $len:expr) => {
+        $crate::DenseColumn::from_vec(vec![$elem; $len])
+    };
+    ($($elem:expr),+) => {
+        $crate::DenseColumn::from_vec(vec![$($elem),+])
+    };
+}

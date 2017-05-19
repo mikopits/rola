@@ -1,6 +1,8 @@
 pub use self::dense_matrix::DenseMatrix;
+pub use self::dense_vector::{DenseColumn, DenseRow};
 
 mod dense_matrix;
+mod dense_vector;
 
 #[cfg(test)]
 mod tests {

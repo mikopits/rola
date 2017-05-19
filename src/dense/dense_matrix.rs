@@ -19,7 +19,6 @@ pub struct DenseMatrix<T> where T: Copy {
 impl<T: Clone + Copy + Num> DenseMatrix<T> {
     /// Create a new DenseMatrix given dimensions and its data in a slice of
     /// matrix rows in vec form.
-    #[inline]
     pub fn new(mat: &[Vec<T>]) -> ::Result<DenseMatrix<T>> {
         let m = mat.len();
         if m == 0 { return Err(::Error::InvalidDimensions) };
@@ -102,6 +101,32 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
             ReadOrder::ColMajor => ReadOrder::RowMajor,
         };
         self
+    }
+
+    /// Get the ith row as an 1 by m `DenseMatrix<T>`.
+    #[inline]
+    pub fn row(&self, i: usize) -> Option<DenseMatrix<T>>
+        where T: FromPrimitive + ToPrimitive,
+    {
+        if i >= self.rows() { return None }
+        let mut v = Vec::with_capacity(self.cols());
+        for j in 0..self.cols() {
+            v.push(self.element(i, j).unwrap());
+        }
+        Some(Self::from_vec(v, 1, self.cols(), None).unwrap())
+    }
+
+    /// Get the jth col as an m by 1 `DenseMatrix<T>`.
+    #[inline]
+    pub fn col(&self, j: usize) -> Option<DenseMatrix<T>>
+        where T: FromPrimitive + ToPrimitive,
+    {
+        if j >= self.cols() { return None }
+        let mut v = Vec::with_capacity(self.rows());
+        for i in 0..self.rows() {
+            v.push(self.element(i, j).unwrap());
+        }
+        Some(Self::from_vec(v, self.rows(), 1, None).unwrap())
     }
 }
 
