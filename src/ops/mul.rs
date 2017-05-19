@@ -55,7 +55,7 @@ impl<T: Clone + Num + FromPrimitive + ToPrimitive> Mul for ZeroMatrix<T>
     }
 }
 
-zero_mul_impl! { DenseMatrix<T> IdentityMatrix<T> SparseMatrix<T> }
+zero_mul_impl! { DenseMatrix<T> SparseMatrix<T> }
 
 macro_rules! ident_mul_impl {
     ($($t:ty)*) => ($(
@@ -100,7 +100,7 @@ impl<T: Clone + Num + FromPrimitive + ToPrimitive>
 }
 
 
-ident_mul_impl! { DenseMatrix<T> SparseMatrix<T> }
+ident_mul_impl! { DenseMatrix<T> SparseMatrix<T> ZeroMatrix<T> }
 
 #[cfg(test)]
 mod tests {
