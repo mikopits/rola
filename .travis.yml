@@ -11,7 +11,7 @@ os:
 #  - windows
 
 notifications:
-  email: false
+  slack: rola-dev:u9NurtJAomDI09EB7ErfJx2J
 
 cache: cargo
 

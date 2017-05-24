@@ -13,7 +13,7 @@ impl Show for CLStatus {
     }
 }
 
-macro_rules! convert {
+macro_rules! convert(
     ($e: expr, $x: ident) => (if $e == $x as cl_int {
         Some($x)
     } else { None });
@@ -21,7 +21,7 @@ macro_rules! convert {
     ($e: expr, $x: ident, $($xs: ident),+) => (if $e == $x as cl_int {
         Some($x)
     } else { convert!($e, $($xs),+) })
-}
+)
 
 pub fn try_convert(status: cl_int) -> Option<CLStatus> {
     convert!(status,
@@ -84,9 +84,9 @@ pub fn convert(status: cl_int) -> CLStatus {
     }
 }
 
-fn error_str(status: cl_int) -> String {
+fn error_str(status: cl_int) -> ~str {
     match try_convert(status) {
-        Some(s) => s.to_string(),
+        Some(s) => s.to_str(),
         None => format!("Unknown Error: {:?}", status)
     }
 }

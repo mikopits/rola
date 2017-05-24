@@ -1,6 +1,7 @@
 extern crate ocl;
 
-use std::{fmt, ptr};
+use std::fmt;
+use std::ptr;
 use std::{mem, thread};
 
 use ocl::ProQue;
@@ -23,7 +24,8 @@ impl OpenCLHandler {
     ////////////////////////////////////////////////////////////////////////////////
     // OpenCLHandler -> handles call from
     ////////////////////////////////////////////////////////////////////////////////
-    pub fn new(&self) -> OpenCLHandler {
+    pub fn new(&self) -> OpenCLHandler
+    {
         // only call to self.opencl_components once
         self.platform = Platform::default();
         self.device = Device::first(self.platform);
@@ -43,11 +45,8 @@ impl OpenCLHandler {
     * @param kernel_args: array of matrices to read to GPU
     * @param resultant_mat:matrix after operation from GPU to vector object
     */
-    pub fn run(&self,
-               src: String,
-               kernel_fn: String,
-               kernel_args: &[Matrix],
-               resultant_mat: &mut Matrix)
+
+    pub fn run(&self, src: String, kernel_fn: String, kernel_args: &[Matrix<T>], resultant_mat: &mut Matrix<T>)
     {
         let program = Program::builder()
             .devices(self.device)
@@ -56,9 +55,10 @@ impl OpenCLHandler {
 
         // TODO Error handling
         let queue = Queue::new(&self.context, self.device, None).unwrap();
-        let kernel = Kernel::new(kernel_fn, &program).unwrap().queue(queue.clone());
+        let kernel = Kernel::new( kernel_fn, &program ).unwrap().queue(queue.clone());
 
-        for matrix in kernel_args.iter() {
+        for matrix in kernel_args.iter()
+        {
              let dims  = matrix.m * matrix.n;
              let buffer = Buffer::<f32>::builder()
                  .queue(queue.clone())
@@ -66,10 +66,11 @@ impl OpenCLHandler {
                  .dims(dims)
                  .host_data(&matrix.mat)
                  .build().unwrap();
+
             kernel.gws(dims).arg_buf(&buffer);
         }
 
-        // Run kernel
+        // run kernel
         let res_dims = resultant_mat.m * resultant_mat.n;
         kernel.cmd().gwo(kernel.get_gwo())
                     .gws(res_dims)
@@ -86,6 +87,8 @@ impl OpenCLHandler {
             .ewait_opt(None::<&EventList>)
             .enew_opt(None::<&mut Event>)
             .enq().unwrap();
+
         resultant_mat.mat = res_vec;
     }
+
 }

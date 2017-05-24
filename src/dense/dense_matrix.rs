@@ -19,7 +19,6 @@ pub struct DenseMatrix<T> where T: Copy {
 impl<T: Clone + Copy + Num> DenseMatrix<T> {
     /// Create a new DenseMatrix given dimensions and its data in a slice of
     /// matrix rows in vec form.
-    #[inline]
     pub fn new(mat: &[Vec<T>]) -> ::Result<DenseMatrix<T>> {
         let m = mat.len();
         if m == 0 { return Err(::Error::InvalidDimensions) };
@@ -40,8 +39,9 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
 
         Ok(DenseMatrix {
             read_order: ReadOrder::default(),
-            m, n,
-            mat: flat_mat })
+            m: m,n: n,
+            mat: flat_mat
+        })
     }
 
     /// Create a new dense matrix from a Vec, its dimensions, and an
@@ -51,16 +51,20 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
     pub fn from_vec(mat: Vec<T>,
                     m: usize,
                     n: usize,
-                    read_order: Option<ReadOrder>) -> DenseMatrix<T>
+                    read_order: Option<ReadOrder>) -> ::Result<DenseMatrix<T>>
     {
-        DenseMatrix {
+        if m*n != mat.len() {
+            return Err(::Error::InvalidDimensions)
+        }
+
+        Ok(DenseMatrix {
             read_order: match read_order {
                 Some(ro) => ro,
                 None => ReadOrder::RowMajor,
             },
-            m, n,
+            m: m,n: n,
             mat: mat.iter().map(|&a| Cell::new(a)).collect(),
-        }
+        })
     }
 
     /// Create a new dense matrix of zeros given the matrix dimensions m and n.
@@ -70,7 +74,7 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
     {
         DenseMatrix{
             read_order: ReadOrder::default(),
-            m, n,
+            m: m, n: n,
             mat: vec![Cell::new(T::from_usize(0 as usize).unwrap()); m*n],
         }
     }
@@ -87,8 +91,8 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
 
         DenseMatrix{
             read_order: ReadOrder::default(),
-            //flags: HashSet::new(),
-            m: n, n, mat }
+            m: n, n: n,
+            mat: mat }
     }
 
     /// Flip the read order. Toggles between row major and column major.
@@ -100,6 +104,32 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
         };
         self
     }
+
+    /// Get the ith row as an 1 by m `DenseMatrix<T>`.
+    #[inline]
+    pub fn row(&self, i: usize) -> Option<DenseMatrix<T>>
+        where T: FromPrimitive + ToPrimitive,
+    {
+        if i >= self.rows() { return None }
+        let mut v = Vec::with_capacity(self.cols());
+        for j in 0..self.cols() {
+            v.push(self.get(i, j).unwrap());
+        }
+        Some(Self::from_vec(v, 1, self.cols(), None).unwrap())
+    }
+
+    /// Get the jth col as an m by 1 `DenseMatrix<T>`.
+    #[inline]
+    pub fn col(&self, j: usize) -> Option<DenseMatrix<T>>
+        where T: FromPrimitive + ToPrimitive,
+    {
+        if j >= self.cols() { return None }
+        let mut v = Vec::with_capacity(self.rows());
+        for i in 0..self.rows() {
+            v.push(self.get(i, j).unwrap());
+        }
+        Some(Self::from_vec(v, self.rows(), 1, None).unwrap())
+    }
 }
 
 impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
@@ -109,7 +139,7 @@ impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
         if !self.is_square() { return false }
         for i in 1..self.rows() {
             for j in 0..i {
-                if self.element(i, j) != self.element(j, i) {
+                if self.get(i, j) != self.get(j, i) {
                     return false
                 }
             }
@@ -126,8 +156,7 @@ impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
         for i in 0..self.m {
             for j in 0..self.n {
                 if i != j {
-                    if self.element(i, j).expect("DenseMatrix::is_diagonal")
-                        != T::zero() { return false }
+                    if self.get(i, j).unwrap() != T::zero() { return false }
                 }
             }
         }
@@ -206,8 +235,8 @@ impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
         }
     }
 
-    /// Get a matrix element at m, n.
-    fn element(&self, i: usize, j: usize) -> Option<T> {
+    /// Get a matrix element at i, j.
+    fn get(&self, i: usize, j: usize) -> Option<T> {
         match self.read_order {
             ReadOrder::RowMajor => {
                 Some(self.mat.get(self.n*i + j)
@@ -218,6 +247,24 @@ impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
                 Some(self.mat.get(self.m*j + i)
                     .expect("DenseMatrix::element")
                     .get())
+            },
+        }
+    }
+
+    /// Set a matrix element at i, j.
+    fn set(&self, i: usize, j: usize, val: T) -> Option<T> {
+        match self.read_order {
+            ReadOrder::RowMajor => {
+                match self.mat.get(self.n*i + j) {
+                    Some(e) => { e.set(val); Some(val) },
+                    None => None,
+                }
+            },
+            ReadOrder::ColMajor => {
+                match self.mat.get(self.m*j + i) {
+                    Some(e) => { e.set(val); Some(val) },
+                    None => None,
+                }
             },
         }
     }
@@ -239,9 +286,9 @@ impl<T: Clone + Copy + Num + ToPrimitive + FromPrimitive>
     }
 }
 
-impl<T: Copy> fmt::Display for DenseMatrix<T> {
+impl<T: Copy + fmt::Debug> fmt::Display for DenseMatrix<T> {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f, "DenseMatrix(m: {}, n: {})", self.m, self.n)
+        write!(f, "DenseMatrix: {:?}", self.m)
     }
 }
 

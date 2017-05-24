@@ -1,5 +1,17 @@
 use ::{FromPrimitive, Num, One, ToPrimitive, Zero};
 use ::{DenseMatrix, IdentityMatrix, Matrix, SparseMatrix, ZeroMatrix};
+use ::{Vector};
+
+impl<T: Clone + Num + ToPrimitive + FromPrimitive>
+    PartialEq for Vec<T>
+{
+    fn eq(&self, other: &Vector<T>) -> bool {
+        self.n == other.n &&
+            ( self.vec.iter()
+                  .zip(other.vec)
+                  .all(|(s, o )| (s.is_nan() && o.is_nan() || (s == o)) ) )
+    }
+}
 
 impl<T: Clone + Num + ToPrimitive + FromPrimitive>
     PartialEq for ZeroMatrix<T>
@@ -25,7 +37,7 @@ impl<T: Clone + Num + ToPrimitive + FromPrimitive>
         if self.dims() != other.dims() { return false }
         for i in 0..self.rows() {
             for j in 0..self.cols() {
-                if self.element(i, j) != other.element(i, j) {
+                if self.get(i, j) != other.get(i, j) {
                     return false
                 }
             }
@@ -97,14 +109,15 @@ impl<T: Clone + Copy + Num + Zero + ToPrimitive + FromPrimitive>
     }
 }
 
-impl<T: Clone + Copy + Num + One + ToPrimitive + FromPrimitive>
+impl<T: Clone + Copy + Num + ToPrimitive + FromPrimitive>
     PartialEq<SparseMatrix<T>> for IdentityMatrix<T>
+    where T: One,
 {
     fn eq(&self, other: &SparseMatrix<T>) -> bool {
         if self.dims() != other.dims() { return false }
         if !other.is_diagonal() { return false }
         for i in 0..self.rows() {
-            if other.element(i, i).unwrap() != One::one() { return false }
+            if other.get(i, i).unwrap() != One::one() { return false }
         }
         true
     }
@@ -127,7 +140,7 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
         }
         for (&(i1, j1), &(i2, j2)) in self.mat.borrow().keys()
             .zip(other.mat.borrow().keys()) {
-            if self.element(i1, j1) != other.element(i2, j2) { return false }
+            if self.get(i1, j1) != other.get(i2, j2) { return false }
         }
         true
     }
@@ -141,7 +154,7 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
         if self.dims() != other.dims() { return false }
         for i in 0..self.rows() {
             for j in 0..self.cols() {
-                if self.element(i, j) != other.element(i, j) {
+                if self.get(i, j) != other.get(i, j) {
                     return false
                 }
             }
@@ -158,7 +171,7 @@ impl<T: Clone + Num + Zero + ToPrimitive + FromPrimitive>
         if self.dims() != other.dims() { return false }
         for i in 0..self.rows() {
             for j in 0..self.cols() {
-                if self.element(i, j) != other.element(i, j) {
+                if self.get(i, j) != other.get(i, j) {
                     return false
                 }
             }
@@ -283,5 +296,27 @@ mod tests {
         let A_s = sparse![mat_sparse; 5, 5];
         assert_eq!(A_s, A_d);
         assert_eq!(A_d, A_s);
+    }
+
+
+    #[test]
+    fn test_vector_eq(){
+        let n = 10000;
+        let v_0 = vec![0; n];
+
+        let mut v_test: Vec = Vec::with_capacity(n);
+        for i in 0..n {
+           v_test_0.push(0);
+        }
+
+        let mut v_test_ord = Vec = Vec::with_capacity(n);
+        for i in 0..n {
+           v_test_ord.push(i);
+        }
+
+        assert_eq!(v_0, v_test_0);
+        assert!( ( v_0, v_test_ord) , false);
+
+
     }
 }
