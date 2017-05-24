@@ -1,5 +1,17 @@
 use ::{FromPrimitive, Num, One, ToPrimitive, Zero};
 use ::{DenseMatrix, IdentityMatrix, Matrix, SparseMatrix, ZeroMatrix};
+use ::{Vector};
+
+impl<T: Clone + Num + ToPrimitive + FromPrimitive>
+    PartialEq for Vec<T>
+{
+    fn eq(&self, other: &Vector<T>) -> bool {
+        self.n == other.n &&
+            ( self.vec.iter()
+                  .zip(other.vec)
+                  .all(|(s, o )| (s.is_nan() && o.is_nan() || (s == o)) ) )
+    }
+}
 
 impl<T: Clone + Num + ToPrimitive + FromPrimitive>
     PartialEq for ZeroMatrix<T>
@@ -284,5 +296,27 @@ mod tests {
         let A_s = sparse![mat_sparse; 5, 5];
         assert_eq!(A_s, A_d);
         assert_eq!(A_d, A_s);
+    }
+
+
+    #[test]
+    fn test_vector_eq(){
+        let n = 10000;
+        let v_0 = vec![0; n];
+
+        let mut v_test: Vec = Vec::with_capacity(n);
+        for i in 0..n {
+           v_test_0.push(0);
+        }
+
+        let mut v_test_ord = Vec = Vec::with_capacity(n);
+        for i in 0..n {
+           v_test_ord.push(i);
+        }
+
+        assert_eq!(v_0, v_test_0);
+        assert!( ( v_0, v_test_ord) , false);
+
+
     }
 }
