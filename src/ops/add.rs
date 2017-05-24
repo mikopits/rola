@@ -1,10 +1,21 @@
 use std::fmt::Debug;
 use std::ops::Add;
+use std::ops::Sub;
 
 use ::{FromPrimitive, Num, One, ToPrimitive};
 use ::{DenseMatrix, IdentityMatrix, Matrix, SparseMatrix, ZeroMatrix};
+use ::{Vector};
+
 
 static ADD_DIM_ERROR: &str = "Cannot add matrices of given dimensions";
+
+macro_rules! check_vec_dims {
+    ($self:expr, $other:expr) => (
+        if $self.len() != $other.len() {
+            panic!("{}: lhs={} rhs={}", ADD_DIM_ERROR, $self, $other)
+        }
+    )
+}
 
 macro_rules! check_add_dims {
     ($self:expr, $other:expr) => (
@@ -32,6 +43,44 @@ macro_rules! zero_add_impl {
 }
 
 zero_add_impl! { DenseMatrix<T> IdentityMatrix<T> SparseMatrix<T> ZeroMatrix<T> }
+
+
+impl<T: Clone + Num + FromPrimitive + ToPrimitive> Add for Vector<T>
+    where T: Copy,
+{
+    type Output = Vector<T>;
+
+    fn add(self, other: Vector<T>) -> Vector<T>{
+        check_vec_dims!(self, other);
+        let n = self.len();
+        let mut r_vec: Vec<T> = Vec::with_capacity( n );
+        unsafe { r_vec.set_len(n); }
+
+        for i in 0..self.len() {
+            r_vec[i] = self.vec[i] + other.vec[i];
+        }
+        Vector::from_vec(r_vec, self.length, None)
+    }
+}
+
+impl<T: Clone + Num + FromPrimitive + ToPrimitive> Sub for Vector<T>
+    where T: Copy,
+{
+    type Output = Vector<T>;
+
+    fn sub(self, other: Vector<T>) -> Vector<T>{
+        check_vec_dims!(self, other);
+        let n = self.len();
+        let mut r_vec: Vec<T> = Vec::with_capacity( n );
+        unsafe { r_vec.set_len(n); }
+
+        for i in 0..self.len() {
+            r_vec[i] = self.vec[i] - other.vec[i];
+        }
+        Vector::from_vec(r_vec, self.length, None)
+    }
+}
+
 
 impl<T: Clone + Num + FromPrimitive + ToPrimitive> Add for DenseMatrix<T>
     where T: Copy + Debug,
@@ -126,6 +175,7 @@ impl<T: Clone + Num + FromPrimitive + ToPrimitive>
 mod tests {
     #![allow(non_snake_case)]
     use ::{DenseMatrix, IdentityMatrix, ZeroMatrix};
+    use ::{Vector};
 
     #[test]
     fn test_good_zero_add() {
@@ -164,5 +214,20 @@ mod tests {
         let A2 = DenseMatrix::new(&mat2).unwrap();
         let I = IdentityMatrix::new(4);
         assert_eq!(A1+I, A2);
+    }
+
+    #[test]
+    fn test_vec_add(){
+        let n = 1000;
+        let vec_0 : Vector<usize> = Vector::zeros(n);
+        let vec_ord: Vec<T> = (1..n).collect();
+        let vector_ord : Vector<T> = Vector::from_vec(vec_ord);
+
+        let vec_ord_x2: Vec<T> = vec_ord.iter().map(|x| x*2);
+        let vector_ord_x2 : Vector<T> = Vector::from_vec(vec_ord_x2);
+
+        assert_eq!( vec_0 + vec_order, vec_order);
+        assert_eq!( vec_ord + vec_0, vec_ord);
+        assert_eq!( vec_ord + vec_ord, vec_ord_x2);
     }
 }

@@ -13,6 +13,10 @@ impl<T: Clone + Copy + Num> DenseRow<T> {
         DenseRow { elems: vec![Cell::new(T::zero()); size] }
     }
 
+    pub fn ones(size: usize) -> DenseRow<T> where T: usize {
+        DenseRow { elems: vec![1; size] }
+    }
+
     pub fn from_vec(vec: Vec<T>) -> DenseRow<T> {
         DenseRow { elems: vec.iter().map(|&e| Cell::new(e)).collect() }
     }

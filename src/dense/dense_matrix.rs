@@ -39,8 +39,9 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
 
         Ok(DenseMatrix {
             read_order: ReadOrder::default(),
-            m, n,
-            mat: flat_mat })
+            m: m,n: n,
+            mat: flat_mat
+        })
     }
 
     /// Create a new dense matrix from a Vec, its dimensions, and an
@@ -61,7 +62,7 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
                 Some(ro) => ro,
                 None => ReadOrder::RowMajor,
             },
-            m, n,
+            m: m,n: n,
             mat: mat.iter().map(|&a| Cell::new(a)).collect(),
         })
     }
@@ -73,7 +74,7 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
     {
         DenseMatrix{
             read_order: ReadOrder::default(),
-            m, n,
+            m: m, n: n,
             mat: vec![Cell::new(T::from_usize(0 as usize).unwrap()); m*n],
         }
     }
@@ -90,7 +91,8 @@ impl<T: Clone + Copy + Num> DenseMatrix<T> {
 
         DenseMatrix{
             read_order: ReadOrder::default(),
-            m: n, n, mat }
+            m: n, n: n,
+            mat: mat }
     }
 
     /// Flip the read order. Toggles between row major and column major.

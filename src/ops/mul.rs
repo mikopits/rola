@@ -4,8 +4,17 @@ use std::ops::Mul;
 use ::{FromPrimitive, Num, ToPrimitive, Zero};
 use ::{DenseMatrix, IdentityMatrix, Matrix, SparseMatrix, ZeroMatrix};
 use ::{DenseColumn, DenseRow, Vector};
+use ::{Vector};
 
 static MUL_DIM_ERROR: &str = "Cannot multiply matrices of given dimensions";
+
+macro_rules! check_vec_dims {
+    ($self:expr, $other:expr) => (
+        if $self.len() != $other.len() {
+            panic!("{}: lhs={} rhs={}", ADD_DIM_ERROR, $self, $other)
+        }
+    )
+}
 
 macro_rules! check_mul_dims {
     ($self:expr, $rhs:expr) => (
@@ -143,10 +152,30 @@ impl<'a, T: 'a + Clone + Num> Mul<DenseRow<T>> for DenseColumn<T>
     }
 }
 
+impl<T: Clone + Num> Mul for Vector<T>
+    where T: Copy,
+{
+    type Output = Vector<T>;
+
+    fn mul(self, scalar: f32) -> Vector<T>{
+        let n = self.len();
+        let mut r_vec: Vec<T> = Vec::with_capacity( n );
+        unsafe { r_vec.set_len(n); }
+
+        for i in 0..self.len() {
+            r_vec[i] = self.vec[i] * scalar;
+        }
+
+        Vector::from_vec(r_vec, self.length, None)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use ::{IdentityMatrix, Matrix, Vector, ZeroMatrix};
+    use ::{Matrix, ZeroMatrix};
+    use ::{Vector};
 
     #[test]
     fn test_good_zero_zero_mul() {
