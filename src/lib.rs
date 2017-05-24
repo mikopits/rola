@@ -1,7 +1,7 @@
 #![allow(dead_code)]
 
 extern crate num;
-extern crate ocl;
+// extern crate ocl;
 
 pub use num::traits::*;
 pub use num::{Rational, Complex};
@@ -16,6 +16,7 @@ mod dense;
 mod error;
 #[macro_use]
 mod macros;
+// mod opencl;
 mod matrix;
 mod ops;
 mod sparse;
