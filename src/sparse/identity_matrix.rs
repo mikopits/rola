@@ -11,7 +11,7 @@ pub struct IdentityMatrix<T> {
 
 impl<T: Num + One + Zero> IdentityMatrix<T> {
     pub fn new(n: usize) -> IdentityMatrix<T> {
-        IdentityMatrix { n, mat: PhantomData }
+        IdentityMatrix { m: n, mat: PhantomData }
     }
 }
 

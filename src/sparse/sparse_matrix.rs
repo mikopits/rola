@@ -20,7 +20,7 @@ impl<T: Clone + Copy + Num + Zero> SparseMatrix<T> {
     pub fn new(m: usize, n: usize) -> SparseMatrix<T> {
         SparseMatrix {
             read_order: ReadOrder::RowMajor,
-            m, n,
+            m: m, n: n,
             mat: Rc::new(RefCell::new(HashMap::new())),
         }
     }
@@ -37,7 +37,7 @@ impl<T: Clone + Copy + Num + Zero> SparseMatrix<T> {
         }
         SparseMatrix {
             read_order: ReadOrder::RowMajor,
-            m, n,
+            m: m, n: n,
             mat: Rc::new(RefCell::new(map)),
         }
     }

@@ -13,7 +13,7 @@ pub struct ZeroMatrix<T> {
 
 impl<T: Clone + Num + Zero> ZeroMatrix<T> {
     pub fn new(m: usize, n: usize) -> ZeroMatrix<T> {
-        ZeroMatrix { m, n, mat: PhantomData }
+        ZeroMatrix { m: m, n: n, mat: PhantomData }
     }
 }
 

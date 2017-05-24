@@ -9,6 +9,7 @@ pub use num::{Rational, Complex};
 pub use self::dense::{DenseMatrix, DenseRow, DenseColumn};
 pub use self::error::{Error, Result};
 pub use self::opencl::{OpenCLHandler};
+pub use self::vector_i::{Vector};
 pub use self::vector::{Vector};
 pub use self::matrix::{Matrix, ReadOrder};
 pub use self::sparse::{IdentityMatrix, SparseMatrix, ZeroMatrix};
